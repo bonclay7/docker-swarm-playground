@@ -1,5 +1,9 @@
 #!/bin/bash
 # from https://raw.githubusercontent.com/bowwowxx/docker_swarm/master/swarm_local.sh
+
+echo "Removing old cluster"
+docker-machine rm -f swarm-master swarm-node1 swarm-node2 2> /dev/null
+
 set -e
 
 docker-machine ip registry || { 
@@ -28,8 +32,6 @@ docker-machine ip consul || {
 	    progrium/consul -server -bootstrap
 }
 
-echo "Removing old cluster"
-docker-machine rm -f swarm-master swarm-node1 swarm-node2 2> /dev/null
 
 echo "Creating swarm-master"
 docker-machine create \
@@ -68,7 +70,6 @@ docker-machine create \
 
 echo "Launching orchestrator"
 eval $(docker-machine env swarm-master)
-docker rm -f registrator
 docker run -d \
     --name=registrator \
 	  --net=host \
@@ -77,7 +78,6 @@ docker run -d \
     consul://$(docker-machine ip consul):8500
 
 eval $(docker-machine env swarm-node1)
-docker rm -f registrator
 docker run -d \
     --name=registrator \
     --net=host \
@@ -86,7 +86,6 @@ docker run -d \
     consul://$(docker-machine ip consul):8500
 
 eval $(docker-machine env swarm-node2)
-docker rm -f registrator
 docker run -d \
     --name=registrator \
     --net=host \
