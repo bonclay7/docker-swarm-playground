@@ -1,49 +1,56 @@
 #!/bin/bash
-# from https://github.com/bowwowxx/docker_swarm/blob/master/swarm_local.sh
-
-# clean before run
-docker-machine rm swarm-zookeeper swarm-master swarm-node1 swarm-node2 2> /dev/null
-
+# from https://raw.githubusercontent.com/bowwowxx/docker_swarm/master/swarm_local.sh
 set -e
 
-docker-machine create \
-    -d virtualbox \
-    swarm-zookeeper
-
-docker $(docker-machine config swarm-zookeeper) run -d \
-    -p "2181:2181" \
-    -p "2888:2888" \
-    -p "3888:3888" \
-    -h "zookeeper" \
-    jplock/zookeeper
+docker-machine ip registry || { 
+	echo "Creating local docker registry"
+	sh $(pwd)/setup_local_docker_registry.sh
+}
 
 docker-machine create \
     -d virtualbox \
+		--engine-registry-mirror http://$(docker-machine ip registry):5000 \
+		--engine-insecure-registry registry-1.docker.io \
+    swl-consul
+
+docker $(docker-machine config swl-consul) run -d \
+    -p "8500:8500" \
+    -h "consul" \
+    progrium/consul -server -bootstrap
+
+docker-machine create \
+    -d virtualbox \
+		--engine-registry-mirror http://$(docker-machine ip registry):5000 \
+		--engine-insecure-registry registry-1.docker.io \
     --swarm \
     --swarm-master \
-    --swarm-discovery="zk://$(docker-machine ip swarm-zookeeper):2181" \
-    --engine-opt="cluster-store=zk://$(docker-machine ip swarm-zookeeper):2181" \
+    --swarm-discovery="consul://$(docker-machine ip swl-consul):8500" \
+    --engine-opt="cluster-store=consul://$(docker-machine ip swl-consul):8500" \
     --engine-opt="cluster-advertise=eth1:0" \
-    swarm-master
+    swl-demo0
 
 docker-machine create \
     -d virtualbox \
+		--engine-registry-mirror http://$(docker-machine ip registry):5000 \
+		--engine-insecure-registry registry-1.docker.io \
     --swarm \
-    --swarm-discovery="zk://$(docker-machine ip swarm-zookeeper):2181" \
-    --engine-opt="cluster-store=zk://$(docker-machine ip swarm-zookeeper):2181" \
+    --swarm-discovery="consul://$(docker-machine ip swl-consul):8500" \
+    --engine-opt="cluster-store=consul://$(docker-machine ip swl-consul):8500" \
     --engine-opt="cluster-advertise=eth1:0" \
-    swarm-node1
+    swl-demo1
 
 docker-machine create \
     -d virtualbox \
+		--engine-registry-mirror http://$(docker-machine ip registry):5000 \
+		--engine-insecure-registry registry-1.docker.io \
     --swarm \
-    --swarm-discovery="zk://$(docker-machine ip swarm-zookeeper):2181" \
-    --engine-opt="cluster-store=zk://$(docker-machine ip swarm-zookeeper):2181" \
+    --swarm-discovery="consul://$(docker-machine ip swl-consul):8500" \
+    --engine-opt="cluster-store=consul://$(docker-machine ip swl-consul):8500" \
     --engine-opt="cluster-advertise=eth1:0" \
-    swarm-node2
+    swl-demo2
 
-eval $(docker-machine env --swarm swarm-master)
-docker network create --driver overlay swarm-net
+eval $(docker-machine env --swarm swl-demo0)
+docker network create --driver overlay bowwow-net
 
-docker run -itd --name=webtest --net=swarm-net --env="constraint:node==swarm-node1" nginx
-docker run -it --net=swarm-net --env="constraint:node==swarm-node2" busybox wget -O- http://webtest
+docker run -itd --name=webtest --net=bowwow-net --env="constraint:node==swl-demo1" nginx
+docker run -it --net=bowwow-net --env="constraint:node==swl-demo2" busybox wget -O- http://webtest
