@@ -29,7 +29,7 @@ docker-machine ip consul || {
 }
 
 echo "Removing old cluster"
-docker-machine rm -f swarm-master swarm-node1 swarm-node2
+docker-machine rm -f swarm-master swarm-node1 swarm-node2 2> /dev/null
 
 docker-machine create \
     -d virtualbox \
@@ -93,10 +93,10 @@ docker run -d \
 
 
 eval $(docker-machine env --swarm swarm-master)
-docker network create --driver overlay bowwow-net
+docker network create --driver overlay swarm-net
 
 
 docker run -itd nginx
 
-docker run -itd --name=webtest --net=bowwow-net --env="constraint:node==swarm-node1" nginx
-docker run -it --net=bowwow-net --env="constraint:node==swarm-node2" busybox wget -O- http://webtest
+docker run -itd --name=webtest --net=swarm-net --env="constraint:node==swarm-node1" nginx
+docker run -it --net=swarm-net --env="constraint:node==swarm-node2" busybox wget -O- http://webtest
