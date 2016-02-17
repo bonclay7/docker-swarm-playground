@@ -31,6 +31,7 @@ docker-machine ip consul || {
 echo "Removing old cluster"
 docker-machine rm -f swarm-master swarm-node1 swarm-node2 2> /dev/null
 
+echo "Creating swarm-master"
 docker-machine create \
     -d virtualbox \
 		--engine-registry-mirror http://$(docker-machine ip registry):5000 \
@@ -42,7 +43,7 @@ docker-machine create \
     --engine-opt="cluster-advertise=eth1:0" \
     swarm-master
 
-docker-machine ip node1 || docker-machine rm node1
+echo "Creating swarm-node1"
 docker-machine create \
     -d virtualbox \
 		--engine-registry-mirror http://$(docker-machine ip registry):5000 \
@@ -53,7 +54,7 @@ docker-machine create \
     --engine-opt="cluster-advertise=eth1:0" \
     swarm-node1
 
-docker-machine ip node2 || docker-machine rm node2
+echo "Creating swarm-node2"
 docker-machine create \
     -d virtualbox \
 		--engine-registry-mirror http://$(docker-machine ip registry):5000 \
@@ -64,11 +65,13 @@ docker-machine create \
     --engine-opt="cluster-advertise=eth1:0" \
     swarm-node2
 
+
+echo "Launching orchestrator"
 eval $(docker-machine env swarm-master)
 docker rm -f registrator
 docker run -d \
     --name=registrator \
-    --net=host \
+	  --net=host \
     --volume=/var/run/docker.sock:/tmp/docker.sock \
     gliderlabs/registrator:latest \
     consul://$(docker-machine ip consul):8500
@@ -95,8 +98,11 @@ docker run -d \
 eval $(docker-machine env --swarm swarm-master)
 docker network create --driver overlay swarm-net
 
-
-docker run -itd nginx
-
-docker run -itd --name=webtest --net=swarm-net --env="constraint:node==swarm-node1" nginx
-docker run -it --net=swarm-net --env="constraint:node==swarm-node2" busybox wget -O- http://webtest
+docker run -itd -P --name=web1 --net=swarm-net nginx
+docker run -itd --name=web2 --net=swarm-net nginx
+docker run -itd --name=web3 --net=swarm-net nginx
+docker run -itd --name=web4 --net=swarm-net nginx
+docker run -it --net=swarm-net busybox wget -O- http://web1
+docker run -it --net=swarm-net busybox wget -O- http://web2
+docker run -it --net=swarm-net busybox wget -O- http://web3
+docker run -it --net=swarm-net busybox wget -O- http://web4
