@@ -99,10 +99,13 @@ eval $(docker-machine env --swarm swarm-master)
 docker network create --driver overlay swarm-net
 
 docker run -itd -P --name=web1 --net=swarm-net nginx
-docker run -itd --name=web2 --net=swarm-net nginx
-docker run -itd --name=web3 --net=swarm-net nginx
-docker run -itd --name=web4 --net=swarm-net nginx
+docker run -itd -P --name=web2 --net=swarm-net nginx
+docker run -itd -P --name=web3 --net=swarm-net nginx
+docker run -itd -P --name=web4 --net=swarm-net nginx
 docker run -it --net=swarm-net busybox wget -O- http://web1
 docker run -it --net=swarm-net busybox wget -O- http://web2
 docker run -it --net=swarm-net busybox wget -O- http://web3
 docker run -it --net=swarm-net busybox wget -O- http://web4
+
+curl $(docker-machine ip consul):8500/v1/catalog/services
+curl $(docker-machine ip consul):8500/v1/catalog/service/nginx-80
