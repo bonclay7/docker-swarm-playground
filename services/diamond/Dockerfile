@@ -1,8 +1,8 @@
 FROM python:2-onbuild
 
-ENV http_proxy
-ENV https_proxy
-ENV ftp_proxy
+ENV http_proxy ""
+ENV https_proxy ""
+ENV ftp_proxy ""
 
 RUN mkdir -p /etc/diamond/
 

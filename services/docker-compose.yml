@@ -8,8 +8,6 @@ services:
     environment:
       - maildomain=mail.bosun.com
       - smtp_user=bosun:bosun
-    env_file:
-      - ./.proxy.env
     networks: 
       - swarm-net
   
@@ -24,8 +22,6 @@ services:
       - "80:80"
       - "2003-2004:2003-2004"
       - "2023-2024:2023-2024"
-    env_file:
-      - ./.proxy.env
     networks: 
       - swarm-net
   
@@ -34,8 +30,6 @@ services:
     ports:
       - "8083:8083"
       - "8086:8086"
-    env_file:
-      - ./.proxy.env
     networks: 
       - swarm-net
   
@@ -49,8 +43,6 @@ services:
     depends_on:
       - graphite
       - influxdb
-    env_file:
-      - ./.proxy.env 
     networks: 
       - swarm-net
   
@@ -65,8 +57,6 @@ services:
       - "8125:8125/udp"
     depends_on:
       - graphite
-    env_file:
-      - ./.proxy.env
     networks: 
       - swarm-net
   
@@ -79,8 +69,6 @@ services:
         - ftp_proxy=http://${PROXY_IP}:3128    
     depends_on:
       - statsd
-    env_file:
-      - ./.proxy.env
     networks: 
       - swarm-net
   
@@ -97,8 +85,6 @@ services:
     depends_on:
       - graphite
       - mail
-    env_file:
-      - ./.proxy.env
     networks: 
       - swarm-net
   

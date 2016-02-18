@@ -14,7 +14,7 @@ docker-machine ip registry || {
   docker-machine create -d virtualbox registry
 
   echo "Launching docker registry cache service"
-  docker $(docker-machine config registry) run -d -p 5000:5000 --name registry-mirror \
+  docker $(docker-machine config registry) run -d -p 5000:5000 --name registry-mirror --restart=always \
       -v $(pwd)/registry/cache:/var/lib/registry/ \
      -v $(pwd)/registry/configuration/:/etc/registry/ \
      registry:2 /etc/registry/config.yml
@@ -35,7 +35,7 @@ docker-machine ip consul || {
       consul
 
   echo "Launching consul machine"
-  docker $(docker-machine config consul) run -d \
+  docker $(docker-machine config consul) run -d --restart=always \
       -p "8500:8500" \
       -h "consul" \
       progrium/consul -server -bootstrap
@@ -46,9 +46,6 @@ docker-machine create \
     -d virtualbox \
     --engine-registry-mirror http://$(docker-machine ip registry):5000 \
     --engine-insecure-registry registry-1.docker.io \
-    --engine-env HTTP_PROXY=http://$(docker-machine ip registry):3128/ \
-    --engine-env HTTPS_PROXY=http://$(docker-machine ip registry):3128/ \
-    --engine-env FTP_PROXY=http://$(docker-machine ip registry):3128/ \
     --swarm \
     --swarm-master \
     --swarm-discovery="consul://$(docker-machine ip consul):8500" \
@@ -83,7 +80,7 @@ for i in $( seq 1 $SWARM_NODES ); do
   eval $(docker-machine env $SWARM_NODE)
 
   echo "Launching registrator"
-  docker run -d \
+  docker run -d --restart=always \
       --name=registrator \
       --net=host \
       --volume=/var/run/docker.sock:/tmp/docker.sock \
