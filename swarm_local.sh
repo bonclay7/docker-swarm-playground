@@ -1,10 +1,11 @@
 #!/bin/bash
 # from https://raw.githubusercontent.com/bowwowxx/docker_swarm/master/swarm_local.sh
 
-echo "Removing old cluster"
+set -x
+
+# echo "Removing old cluster"
 # docker-machine rm -f swarm-master swarm-node1 swarm-node2 2> /dev/null
 
-set -x
 
 SWARM_NODES=2
 
@@ -19,7 +20,7 @@ docker-machine ip registry || {
      registry:2 /etc/registry/config.yml
 
   echo "Launching squid proxy on registry machine"
-  docker $(docker-machine config registry) run -d docker run --name squid -d --restart=always \
+  docker $(docker-machine config registry) run -d --name squid --restart=always \
     -p 3128:3128 \
     -v $(pwd)/registry/proxy_cache:/var/spool/squid3 \
     sameersbn/squid:3.3.8-7
@@ -45,6 +46,9 @@ docker-machine create \
     -d virtualbox \
     --engine-registry-mirror http://$(docker-machine ip registry):5000 \
     --engine-insecure-registry registry-1.docker.io \
+    --engine-env HTTP_PROXY=http://$(docker-machine ip registry):3128/ \
+    --engine-env HTTPS_PROXY=http://$(docker-machine ip registry):3128/ \
+    --engine-env FTP_PROXY=http://$(docker-machine ip registry):3128/ \
     --swarm \
     --swarm-master \
     --swarm-discovery="consul://$(docker-machine ip consul):8500" \
