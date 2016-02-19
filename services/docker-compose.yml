@@ -18,6 +18,7 @@ services:
         - http_proxy=http://${PROXY_IP}:3128
         - https_proxy=http://${PROXY_IP}:3128
         - ftp_proxy=http://${PROXY_IP}:3128
+        - no_proxy=localhost,127.0.0.1,*.swarm-net
     ports:
       - "80:80"
       - "2003-2004:2003-2004"
@@ -40,6 +41,7 @@ services:
         - http_proxy=http://${PROXY_IP}:3128
         - https_proxy=http://${PROXY_IP}:3128
         - ftp_proxy=http://${PROXY_IP}:3128
+        - no_proxy=localhost,127.0.0.1,*.swarm-net
     depends_on:
       - graphite
       - influxdb
@@ -53,6 +55,7 @@ services:
         - http_proxy=http://${PROXY_IP}:3128
         - https_proxy=http://${PROXY_IP}:3128
         - ftp_proxy=http://${PROXY_IP}:3128
+        - no_proxy=localhost,127.0.0.1,*.swarm-net
     ports:
       - "8125:8125/udp"
     depends_on:
@@ -67,6 +70,7 @@ services:
         - http_proxy=http://${PROXY_IP}:3128
         - https_proxy=http://${PROXY_IP}:3128
         - ftp_proxy=http://${PROXY_IP}:3128    
+        - no_proxy=localhost,127.0.0.1,*.swarm-net
     depends_on:
       - statsd
     networks: 
@@ -79,6 +83,7 @@ services:
         - http_proxy=http://${PROXY_IP}:3128
         - https_proxy=http://${PROXY_IP}:3128
         - ftp_proxy=http://${PROXY_IP}:3128      
+        - no_proxy=localhost,127.0.0.1,*.swarm-net
     ports:
       - "8070:8070"
       - "4242:4242"

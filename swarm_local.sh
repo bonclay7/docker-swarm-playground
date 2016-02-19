@@ -23,7 +23,7 @@ docker-machine ip registry || {
   docker run --rm -it --volumes-from cache ubuntu chmod -R 777 /cache
 
   echo "Launching docker registry cache service"
-  docker run -d -p 5000:5000 --name registry-mirror --restart=always \
+  docker run -d -p 5000:5000 --name registry --restart=always \
      --volumes-from cache \
      -v $(pwd)/registry/config.yml:/etc/registry/config.yml \
      registry:2 /etc/registry/config.yml
@@ -55,7 +55,7 @@ echo "Creating swarm-master"
 docker-machine create \
     -d virtualbox \
     --virtualbox-memory $SWARM_MEMORY \
-    --virtualbox-count $SWARM_CPU \
+    --virtualbox-cpu-count $SWARM_CPU \
     --engine-registry-mirror http://$(docker-machine ip registry):5000 \
     --engine-insecure-registry registry-1.docker.io \
     --swarm \
@@ -63,6 +63,9 @@ docker-machine create \
     --swarm-discovery="consul://$(docker-machine ip consul):8500" \
     --engine-opt="cluster-store=consul://$(docker-machine ip consul):8500" \
     --engine-opt="cluster-advertise=eth1:0" \
+    --engine-env HTTP_PROXY=http://$(docker-machine ip registry):3128/ \
+    --engine-env HTTPS_PROXY=http://$(docker-machine ip registry):3128/ \
+    --engine-env FTP_PROXY=http://$(docker-machine ip registry):3128/ \
     swarm-master
 
 eval $(docker-machine env swarm-master)
@@ -79,7 +82,7 @@ for i in $( seq 1 $SWARM_NODES ); do
   docker-machine create \
       -d virtualbox \
       --virtualbox-memory $SWARM_MEMORY \
-      --virtualbox-count $SWARM_CPU \
+      --virtualbox-cpu-count $SWARM_CPU \
       --engine-registry-mirror http://$(docker-machine ip registry):5000 \
       --engine-insecure-registry registry-1.docker.io \
       --engine-env HTTP_PROXY=http://$(docker-machine ip registry):3128/ \
