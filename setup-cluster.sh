@@ -26,20 +26,25 @@ docker-machine ip tools || {
   docker run --rm -it --volumes-from cache ubuntu chmod -R 777 /cache
 
   echo "Launching docker registry service on tools machine"
-  docker run -d -p 5000:5000 --name registry --restart=always \
+  docker run -d -p 5000:5000 \
+     --name registry\
+     --restart=always \
      --volumes-from cache \
      -v $(pwd)/registry/config.yml:/etc/registry/config.yml \
      registry:2 /etc/registry/config.yml
 
   echo "Launching squid proxy on tools machine"
-  docker run -d --name squid --restart=always \
+  docker run -d \
+    --name squid \
+    --restart=always \
     -p 3128:3128 \
     --volumes-from cache \
     -v $(pwd)/proxy/squid.conf:/etc/squid3/squid.conf \
     sameersbn/squid:3.3.8-7
 
   echo "Launching consul on tools machine"
-  docker run -d --restart=always \
+  docker run -d --restart=always\
+      --name consul \
       -p "8500:8500" \
       -h "consul" \
       progrium/consul -server -bootstrap
