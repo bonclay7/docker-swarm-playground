@@ -8,6 +8,7 @@ set -x
 
 
 SWARM_NODES=2
+AMBARI_NODES=3
 SWARM_MEMORY=4096
 
 
@@ -99,7 +100,7 @@ for i in $( seq 1 $SWARM_NODES ); do
 done
 
 eval $(docker-machine env --swarm swarm-master)
-docker network rm swarm-net
+docker network inspect swarm-net && docker network rm swarm-net
 docker network create --driver overlay swarm-net
 
 pushd ./services
@@ -107,6 +108,24 @@ export PROXY_IP=$(docker-machine ip registry)
 docker-compose build
 docker-compose up
 popd
+
+echo "Run ambari master"
+docker run -d --restart=always \
+  --hostname=ambari-master.swarm-net \
+  --name=ambari-master \
+  --net=swarm-net \
+  -p 8080 \
+  whylu/docker-ambari:server
+
+for i in $( seq 1 $AMBARI_NODES ); do
+  echo "Run ambari node $i"
+  docker run -d --restart=always \
+    -e SERVER_FQDN=ambari-master.swarm-net \
+    --hostname=ambari-node$i.swarm-net \
+    --name=ambari-node$i \
+    --net=swarm-net \
+    whylu/docker-ambari:agent
+done
 
 curl $(docker-machine ip consul):8500/v1/catalog/services | jq
 # curl $(docker-machine ip consul):8500/v1/catalog/service/nginx-80
