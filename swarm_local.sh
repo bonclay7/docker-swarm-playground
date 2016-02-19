@@ -8,8 +8,9 @@ set -x
 
 
 SWARM_NODES=2
-AMBARI_NODES=3
+SWARM_CPU=4
 SWARM_MEMORY=4096
+AMBARI_NODES=3
 
 
 docker-machine ip registry || {
@@ -54,6 +55,7 @@ echo "Creating swarm-master"
 docker-machine create \
     -d virtualbox \
     --virtualbox-memory $SWARM_MEMORY \
+    --virtualbox-count $SWARM_CPU \
     --engine-registry-mirror http://$(docker-machine ip registry):5000 \
     --engine-insecure-registry registry-1.docker.io \
     --swarm \
@@ -77,6 +79,7 @@ for i in $( seq 1 $SWARM_NODES ); do
   docker-machine create \
       -d virtualbox \
       --virtualbox-memory $SWARM_MEMORY \
+      --virtualbox-count $SWARM_CPU \
       --engine-registry-mirror http://$(docker-machine ip registry):5000 \
       --engine-insecure-registry registry-1.docker.io \
       --engine-env HTTP_PROXY=http://$(docker-machine ip registry):3128/ \
@@ -109,6 +112,7 @@ docker-compose build
 docker-compose up
 popd
 
+AMBARI_NODES=1
 echo "Run ambari master"
 docker run -d --restart=always \
   --hostname=ambari-master.swarm-net \
