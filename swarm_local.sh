@@ -14,17 +14,23 @@ SWARM_MEMORY=4096
 docker-machine ip registry || {
   echo "Creating local docker registry machine"
   docker-machine create -d virtualbox registry
+  eval $(docker-machine env registry)
+
+  echo "Creating shared volume"
+  docker create -v /cache --name cache ubuntu
+  docker run --rm -it --volumes-from cache ubuntu chmod -R 777 /cache
 
   echo "Launching docker registry cache service"
-  docker $(docker-machine config registry) run -d -p 5000:5000 --name registry-mirror --restart=always \
-      -v $(pwd)/registry/cache:/var/lib/registry/ \
-     -v $(pwd)/registry/configuration/:/etc/registry/ \
+  docker run -d -p 5000:5000 --name registry-mirror --restart=always \
+     --volumes-from cache \
+     -v $(pwd)/registry/config.yml:/etc/registry/config.yml \
      registry:2 /etc/registry/config.yml
 
   echo "Launching squid proxy on registry machine"
-  docker $(docker-machine config registry) run -d --name squid --restart=always \
+  docker run -d --name squid --restart=always \
     -p 3128:3128 \
-    -v $(pwd)/registry/proxy_cache:/var/spool/squid3 \
+    --volumes-from cache \
+    -v $(pwd)/proxy/squid.conf:/etc/squid3/squid.conf \
     sameersbn/squid:3.3.8-7
 }
 
