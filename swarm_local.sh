@@ -8,6 +8,8 @@ set -x
 
 
 SWARM_NODES=2
+SWARM_MEMORY=4096
+
 
 docker-machine ip registry || {
   echo "Creating local docker registry machine"
@@ -44,6 +46,7 @@ docker-machine ip consul || {
 echo "Creating swarm-master"
 docker-machine create \
     -d virtualbox \
+    --virtualbox-memory $SWARM_MEMORY \
     --engine-registry-mirror http://$(docker-machine ip registry):5000 \
     --engine-insecure-registry registry-1.docker.io \
     --swarm \
@@ -66,6 +69,7 @@ for i in $( seq 1 $SWARM_NODES ); do
   SWARM_NODE=$(echo swarm-node$i)
   docker-machine create \
       -d virtualbox \
+      --virtualbox-memory $SWARM_MEMORY \
       --engine-registry-mirror http://$(docker-machine ip registry):5000 \
       --engine-insecure-registry registry-1.docker.io \
       --engine-env HTTP_PROXY=http://$(docker-machine ip registry):3128/ \
