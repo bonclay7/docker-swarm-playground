@@ -20,6 +20,8 @@ docker-machine ip registry || {
 
   echo "Creating shared volume"
   docker create -v /cache --name cache ubuntu
+  echo "configuring shared volume"
+  docker run --rm -it --volumes-from cache ubuntu mkdir -p /cache/registry
   docker run --rm -it --volumes-from cache ubuntu chmod -R 777 /cache
 
   echo "Launching docker registry cache service"
