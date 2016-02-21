@@ -1,17 +1,11 @@
 #!/bin/bash
-# from https://raw.githubusercontent.com/bowwowxx/docker_swarm/master/swarm_local.sh
 
 set -x
-
-# echo "Removing old cluster"
-# docker-machine rm -f swarm-master swarm-node1 swarm-node2 2> /dev/null
-
 
 SWARM_NODES=2
 SWARM_CPU=4
 SWARM_MEMORY=4096
 AMBARI_NODES=3
-
 
 docker-machine ip tools || {	
   echo "Creating tools machine"
