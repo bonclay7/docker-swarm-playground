@@ -19,3 +19,6 @@ for i in $( seq 1 $AMBARI_NODES ); do
     ambari_agent
 done
 
+echo "Here is your ambari server location"
+docker ps | grep ambari_server
+
