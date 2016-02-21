@@ -11,6 +11,7 @@ RUN apt-get clean
 RUN git clone https://github.com/Symantec/ambari-cassandra-service.git /var/lib/ambari-server/resources/stacks/HDP/2.3/services/CASSANDRA
 RUN git clone https://github.com/Symantec/ambari-influxdb-service.git /var/lib/ambari-server/resources/stacks/HDP/2.3/services/INFLUXDB
 RUN git clone https://github.com/Symantec/ambari-elasticsearch-service.git /var/lib/ambari-server/resources/stacks/HDP/2.3/services/ELASTICSEARCH
+RUN git clone https://github.com/abajwa-hw/ntpd-stack.git /var/lib/ambari-server/resources/stacks/HDP/2.3/services/NTPD
 
 EXPOSE 8080
 CMD cat /var/lib/ambari-server/ambari-env.sh && echo "" >> /var/lib/ambari-server/ambari-env.sh \
