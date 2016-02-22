@@ -1,0 +1,57 @@
+version: '2'
+
+services:
+  influxdb:
+    image: tutum/influxdb:0.10
+    ports:
+      - "8083:8083"
+      - "8086:8086"
+    networks:
+      - swarm-net
+
+  telegraf:
+    build:
+      context: ./telegraf/
+      args:
+        - http_proxy=http://${PROXY_IP}:3128
+        - https_proxy=http://${PROXY_IP}:3128
+        - ftp_proxy=http://${PROXY_IP}:3128
+        - no_proxy=localhost,127.0.0.1,*.swarm-net
+    depends_on:
+      - influxdb
+    networks:
+      - swarm-net
+
+  chronograf:
+    build:
+      context: ./chronograf/
+      args:
+        - http_proxy=http://${PROXY_IP}:3128
+        - https_proxy=http://${PROXY_IP}:3128
+        - ftp_proxy=http://${PROXY_IP}:3128
+        - no_proxy=localhost,127.0.0.1,*.swarm-net
+    ports:
+      - "10000:10000"
+    depends_on:
+      - influxdb
+    networks:
+      - swarm-net
+
+  kapacitor:
+    build:
+      context: ./kapacitor/
+      args:
+        - http_proxy=http://${PROXY_IP}:3128
+        - https_proxy=http://${PROXY_IP}:3128
+        - ftp_proxy=http://${PROXY_IP}:3128
+        - no_proxy=localhost,127.0.0.1,*.swarm-net
+    ports:
+      - "9092:9092"
+    depends_on:
+      - influxdb
+    networks:
+      - swarm-net
+
+networks:
+  swarm-net:
+    external: true

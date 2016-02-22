@@ -39,7 +39,7 @@ docker-machine ip tools || {
   echo "Launching consul on tools machine"
   docker run -d --restart=always\
       --name consul \
-      -p "8500:8500" \
+      -p 8500:8500 \
       -h "consul" \
       progrium/consul -server -bootstrap
 }
