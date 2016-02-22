@@ -2,10 +2,10 @@
 
 set -x
 
+REGISTRY_DISK_SIZE=30000
 SWARM_NODES=2
 SWARM_CPU=4
 SWARM_MEMORY=4096
-AMBARI_NODES=3
 
 docker-machine ip tools || {	
   echo "Creating tools machine"
@@ -21,7 +21,8 @@ docker-machine ip tools || {
 
   echo "Launching docker registry service on tools machine"
   docker run -d -p 5000:5000 \
-     --name registry\
+     --name registry \
+     --virtualbox-disk-size $REGISTRY_DISK_SIZE \
      --restart=always \
      --volumes-from cache \
      -v $(pwd)/registry/config.yml:/etc/registry/config.yml \
