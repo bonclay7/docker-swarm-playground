@@ -8,6 +8,7 @@ RUN wget https://s3.amazonaws.com/kapacitor/kapacitor_0.10.1-1_amd64.deb \
   && dpkg -i kapacitor_0.10.1-1_amd64.deb
 
 ADD ./kapacitor.conf /etc/kapacitor/kapacitor.conf
+ADD ./tasks /etc/kapacitor/tasks
 
 EXPOSE 9092
 
