@@ -57,4 +57,3 @@ Effective stack by [influxdata](https://influxdata.com/) for telemetry
 | _9092_       |  Kapacitor         |
 | _3000_       |  Grafana           |
 
-#### Open ports
