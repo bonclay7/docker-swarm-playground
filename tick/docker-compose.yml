@@ -52,6 +52,21 @@ services:
     networks:
       - swarm-net
 
+  grafana:
+    build:
+      context: ./grafana/
+      args:
+        - http_proxy=http://${PROXY_IP}:3128
+        - https_proxy=http://${PROXY_IP}:3128
+        - ftp_proxy=http://${PROXY_IP}:3128
+        - no_proxy=localhost,127.0.0.1,*.swarm-net
+    ports:
+      - "3000:3000"
+    depends_on:
+      - influxdb
+    networks:
+      - swarm-net
+
 networks:
   swarm-net:
     external: true

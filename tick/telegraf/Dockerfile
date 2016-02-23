@@ -2,7 +2,7 @@ FROM debian:latest
 
 ARG TELEGRAF_VERSION=0.10.3-1
 
-RUN apt-get update && apt-get install -y wget lsof
+RUN apt-get update && apt-get install -y lsof wget
 
 WORKDIR /tmp
 
