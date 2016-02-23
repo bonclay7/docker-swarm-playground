@@ -1,11 +1,13 @@
 FROM debian:latest
 
-RUN apt-get update && apt-get install -y wget curl telnet lsof
+ARG TELEGRAF_VERSION=0.10.3-1
+
+RUN apt-get update && apt-get install -y wget lsof
 
 WORKDIR /tmp
 
-RUN wget http://get.influxdb.org/telegraf/telegraf_0.10.3-1_amd64.deb \
-  && dpkg -i telegraf_0.10.3-1_amd64.deb
+RUN wget http://get.influxdb.org/telegraf/telegraf_${TELEGRAF_VERSION}_amd64.deb \
+  && dpkg -i telegraf_${TELEGRAF_VERSION}_amd64.deb
 
 ADD ./telegraf.conf /etc/telegraf/telegraf.conf
 

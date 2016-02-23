@@ -1,11 +1,13 @@
 FROM debian:latest
 
-RUN apt-get update && apt-get install -y wget curl telnet
+ARG CHRONOGRAPH_VERSION=0.10.0
+
+RUN apt-get update && apt-get install -y wget
 
 WORKDIR /tmp
 
-RUN wget https://s3.amazonaws.com/get.influxdb.org/chronograf/chronograf_0.10.0_amd64.deb \
-  && dpkg -i chronograf_0.10.0_amd64.deb
+RUN wget https://s3.amazonaws.com/get.influxdb.org/chronograf/chronograf_${CHRONOGRAPH_VERSION}_amd64.deb \
+  && dpkg -i chronograf_${CHRONOGRAPH_VERSION}_amd64.deb
 
 ENV CHRONOGRAF_BIND 0.0.0.0:10000
 
