@@ -47,3 +47,13 @@ Effective stack by [influxdata](https://influxdata.com/) for telemetry
 ```bash
 ./tick.sh
 ```
+
+#### Ports
+
+| Ports        |     Services       |
+| :---------   | :----------------: |
+| _8083, 8086_ |  InfluxDB          |
+| _10000_      |  Chronograf        |
+| _9092_       |  Kapacitor         | 
+
+#### Open ports
