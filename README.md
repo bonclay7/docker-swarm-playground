@@ -54,6 +54,7 @@ Effective stack by [influxdata](https://influxdata.com/) for telemetry
 | :---------   | :----------------: |
 | _8083, 8086_ |  InfluxDB          |
 | _10000_      |  Chronograf        |
-| _9092_       |  Kapacitor         | 
+| _9092_       |  Kapacitor         |
+| _3000_       |  Grafana           |
 
 #### Open ports
