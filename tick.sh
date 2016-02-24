@@ -7,7 +7,7 @@ docker ps -a |grep tick|awk '{print $1}'|xargs docker rm -f
 
 pushd ./tick
 export PROXY_IP=$(docker-machine ip tools)
-#docker-compose build
+docker-compose build
 docker-compose up -d
 popd
 
