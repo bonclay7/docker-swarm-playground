@@ -8,7 +8,7 @@ services:
         - http_proxy=http://${PROXY_IP}:3128
         - https_proxy=http://${PROXY_IP}:3128
         - ftp_proxy=http://${PROXY_IP}:3128
-        - no_proxy=localhost,127.0.0.1,*.swarm-net
+        - no_proxy=localhost,127.0.0.1
     ports:
       - "8083:8083"
       - "8086:8086"
@@ -27,7 +27,7 @@ services:
         - http_proxy=http://${PROXY_IP}:3128
         - https_proxy=http://${PROXY_IP}:3128
         - ftp_proxy=http://${PROXY_IP}:3128
-        - no_proxy=localhost,127.0.0.1,*.swarm-net
+        - no_proxy=localhost,127.0.0.1
     hostname: telegraf
     depends_on:
       - influxdb
@@ -41,7 +41,7 @@ services:
         - http_proxy=http://${PROXY_IP}:3128
         - https_proxy=http://${PROXY_IP}:3128
         - ftp_proxy=http://${PROXY_IP}:3128
-        - no_proxy=localhost,127.0.0.1,*.swarm-net
+        - no_proxy=localhost,127.0.0.1
     hostname: collectd
     ports:
       - "80:80"
@@ -57,7 +57,7 @@ services:
         - http_proxy=http://${PROXY_IP}:3128
         - https_proxy=http://${PROXY_IP}:3128
         - ftp_proxy=http://${PROXY_IP}:3128
-        - no_proxy=localhost,127.0.0.1,*.swarm-net
+        - no_proxy=localhost,127.0.0.1
     ports:
       - "10000:10000"
     depends_on:
@@ -72,7 +72,7 @@ services:
         - http_proxy=http://${PROXY_IP}:3128
         - https_proxy=http://${PROXY_IP}:3128
         - ftp_proxy=http://${PROXY_IP}:3128
-        - no_proxy=localhost,127.0.0.1,*.swarm-net
+        - no_proxy=localhost,127.0.0.1
     ports:
       - "9092:9092"
     depends_on:
@@ -87,7 +87,7 @@ services:
         - http_proxy=http://${PROXY_IP}:3128
         - https_proxy=http://${PROXY_IP}:3128
         - ftp_proxy=http://${PROXY_IP}:3128
-        - no_proxy=localhost,127.0.0.1,*.swarm-net
+        - no_proxy=localhost,127.0.0.1
     ports:
       - "3000:3000"
     depends_on:
@@ -102,7 +102,7 @@ services:
         - http_proxy=http://${PROXY_IP}:3128
         - https_proxy=http://${PROXY_IP}:3128
         - ftp_proxy=http://${PROXY_IP}:3128
-        - no_proxy=localhost,127.0.0.1,*.swarm-net
+        - no_proxy=localhost,127.0.0.1
     ports:
       - "9092:9092"
     environment:
@@ -118,7 +118,7 @@ services:
         - http_proxy=http://${PROXY_IP}:3128
         - https_proxy=http://${PROXY_IP}:3128
         - ftp_proxy=http://${PROXY_IP}:3128
-        - no_proxy=localhost,127.0.0.1,*.swarm-net
+        - no_proxy=localhost,127.0.0.1
     depends_on:
       - kafka
     networks:
