@@ -105,11 +105,22 @@ services:
         - no_proxy=localhost,127.0.0.1,*.swarm-net
     ports:
       - "9092:9092"
-    networks:
-      - swarm-net
     environment:
       - KAFKA_ADVERTISED_PORT=9092
       - KAFKA_ZOOKEEPER_CONNECT=${ZOOKEEPER_IP}
+    networks:
+      - swarm-net
+
+  kafkaclient:
+    build:
+      context: ./kafka_client/
+      args:
+        - http_proxy=http://${PROXY_IP}:3128
+        - https_proxy=http://${PROXY_IP}:3128
+        - ftp_proxy=http://${PROXY_IP}:3128
+        - no_proxy=localhost,127.0.0.1,*.swarm-net
+    networks:
+      - swarm-net
 
 networks:
   swarm-net:
