@@ -6,9 +6,6 @@ INFLUX_HOST="localhost"
 INFLUX_API_PORT="8086"
 API_URL="http://${INFLUX_HOST}:${INFLUX_API_PORT}"
 
-# Dynamically change the value of 'max-open-shards' to what 'ulimit -n' returns
-sed -i "s/^max-open-shards.*/max-open-shards = $(ulimit -n)/" ${CONFIG_FILE}
-
 # Configure InfluxDB Cluster
 if [ -n "${FORCE_HOSTNAME}" ]; then
     if [ "${FORCE_HOSTNAME}" == "auto" ]; then
@@ -73,6 +70,20 @@ fi
 if [ -n "${COLLECTD_BINDING}" ]; then
     echo "COLLECTD_BINDING: ${COLLECTD_BINDING}"
     sed -i -r -e "/^\[collectd\]/, /^$/ { s/( *)# *(.*)\":25826\"/\1\2\"${COLLECTD_BINDING}\"/g;}" ${CONFIG_FILE}
+fi
+if [ -n "${COLLECTD_RETENTION_POLICY}" ]; then
+    echo "COLLECTD_RETENTION_POLICY: ${COLLECTD_RETENTION_POLICY}"
+    sed -i -r -e "/^\[collectd\]/, /^$/ { s/( *)# *(retention-policy.*)\"\"/\1\2\"${COLLECTD_RETENTION_POLICY}\"/g;}" ${CONFIG_FILE}
+fi
+
+# Add OpenTSDB support
+if [ -n "${OPENTSDB_DB}" ]; then
+    echo "OPENTSDB_DB: ${OPENTSDB_DB}"
+    sed -i -r -e "/^\[opentsdb\]/, /^$/ { s/false/true/; s/( *)# *(.*)\"opentsdb\"/\1\2\"${OPENTSDB_DB}\"/g;}" ${CONFIG_FILE}
+fi
+if [ -n "${OPENTSDB_BINDING}" ]; then
+    echo "OPENTSDB_BINDING: ${OPENTSDB_BINDING}"
+    sed -i -r -e "/^\[opentsdb\]/, /^$/ { s/( *)# *(.*)\":4242\"/\1\2\"${OPENTSDB_BINDING}\"/g;}" ${CONFIG_FILE}
 fi
 if [ -n "${COLLECTD_RETENTION_POLICY}" ]; then
     echo "COLLECTD_RETENTION_POLICY: ${COLLECTD_RETENTION_POLICY}"

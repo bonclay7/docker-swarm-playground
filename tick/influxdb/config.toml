@@ -267,8 +267,8 @@ hostname = "localhost"
 
 [collectd]
   enabled = false
-  # bind-address = ""
-  # database = ""
+  # database = "collectd"
+  # bind-address = ":25826"
   # typesdb = ""
 
   # These next lines control how batching works. You should have this enabled

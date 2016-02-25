@@ -2,15 +2,21 @@ version: '2'
 
 services:
   influxdb:
-    image: ./influxdb/
+    build:
+      context: ./influxdb/
+      args:
+        - http_proxy=http://${PROXY_IP}:3128
+        - https_proxy=http://${PROXY_IP}:3128
+        - ftp_proxy=http://${PROXY_IP}:3128
+        - no_proxy=localhost,127.0.0.1,*.swarm-net
     ports:
       - "8083:8083"
       - "8086:8086"
       - "25826:25826/udp"
     environment:
+      - PRE_CREATE_DB=telemetry
       - COLLECTD_DB=telemetry
       - COLLECTD_BINDING=:25826
-      - PRE_CREATE_DB=telemetry
     networks:
       - swarm-net
 
