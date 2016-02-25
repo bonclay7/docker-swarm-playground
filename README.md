@@ -16,7 +16,8 @@ Download and install the dependencies
 We provide a little cluster of 4 vms running `boot2docker`
 
 -   `tools` containing a local docker `registry` and a `squid` proxy for
-    images and network caching ; `consul` for service discovery and key/value storage
+    images and network caching ; `consul` for service discovery and key/value storage ;
+    `zookeeper` for kafka
 
 -   `swarm-master`, docker swarm master node
 
@@ -29,6 +30,17 @@ We provide a little cluster of 4 vms running `boot2docker`
 ```bash
 ./setup-cluster.sh
 ```
+
+#### Ports
+
+Opened ports on tools machine
+
+| Ports              |     Services       |
+| :----------------- | :----------------: |
+| _8500_             |  Consul            |
+| _5000_             |  Registry          |
+| _3128_             |  Squid Proxy       |
+| _2181_             |  Zookeeper         |
 
 ## Launch your services
 
@@ -56,4 +68,3 @@ Effective stack by [influxdata](https://influxdata.com/) for telemetry
 | _10000_      |  Chronograf        |
 | _9092_       |  Kapacitor         |
 | _3000_       |  Grafana           |
-

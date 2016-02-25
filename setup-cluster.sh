@@ -43,6 +43,12 @@ docker-machine ip tools || {
       -p 8500:8500 \
       -h "consul" \
       progrium/consul -server -bootstrap
+
+  echo "Launching zookeeper on tools machine"
+  docker run -d --restart=always\
+      --name zookeeper \
+      -p 2181:2181 \
+      jplock/zookeeper
 }
 
 echo "Creating swarm-master"
