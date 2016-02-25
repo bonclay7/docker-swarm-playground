@@ -3,6 +3,7 @@
 echo "Using swarm cluster environment"
 eval $(docker-machine env --swarm swarm-master)
 export PROXY_IP=$(docker-machine ip tools)
+export ZOOKEEPER_IP=$(docker-machine ip tools)
 
 echo "Cleanup old containters"
 docker ps -a |grep tick|awk '{print $1}'|xargs docker rm -f
