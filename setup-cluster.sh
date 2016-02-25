@@ -10,7 +10,7 @@ SWARM_MEMORY=4096
 docker-machine ip tools || {	
   echo "Creating tools machine"
 
-  docker-machine create -d virtualbox tools
+  docker-machine create -d --virtualbox-disk-size $REGISTRY_DISK_SIZE virtualbox tools
   eval $(docker-machine env tools)
 
   echo "Creating shared volume"
@@ -22,11 +22,10 @@ docker-machine ip tools || {
   echo "Launching docker registry service on tools machine"
   docker run -d -p 5000:5000 \
      --name registry \
-     --virtualbox-disk-size $REGISTRY_DISK_SIZE \
      --restart=always \
      --volumes-from cache \
      -v $(pwd)/registry/config.yml:/etc/registry/config.yml \
-     registry:2 /etc/registry/config.yml
+     registry:2.3.0 /etc/registry/config.yml
 
   echo "Launching squid proxy on tools machine"
   docker run -d \
