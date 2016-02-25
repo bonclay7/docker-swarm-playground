@@ -9,7 +9,7 @@ class Producer(threading.Thread):
 
     def run(self):
         print "producer"
-        producer = KafkaProducer(bootstrap_servers='192.168.99.103:9092')
+        producer = KafkaProducer(bootstrap_servers='kafka:9092')
         print "producer... ok"
 
         while True:
@@ -23,7 +23,7 @@ class Consumer(threading.Thread):
 
     def run(self):
         print "consummer"
-        consumer = KafkaConsumer(bootstrap_servers='192.168.99.103:9092',
+        consumer = KafkaConsumer(bootstrap_servers='kafka:9092',
                                  auto_offset_reset='earliest')
         print "consummer ... ok"
         consumer.subscribe(['my-topic'])

@@ -119,6 +119,8 @@ services:
         - https_proxy=http://${PROXY_IP}:3128
         - ftp_proxy=http://${PROXY_IP}:3128
         - no_proxy=localhost,127.0.0.1,*.swarm-net
+    depends_on:
+      - kafka
     networks:
       - swarm-net
 

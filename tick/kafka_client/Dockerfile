@@ -5,4 +5,6 @@ RUN apt-get install -y python python-pip
 RUN apt-get install -y libsnappy-dev python-snappy
 RUN pip install kafka-python
 
-CMD bash
+WORKDIR /tmp
+COPY sample.py /tmp
+CMD /tmp/sample.py
