@@ -7,10 +7,10 @@ SWARM_NODES=2
 SWARM_CPU=4
 SWARM_MEMORY=4096
 
-docker-machine ip tools || {	
+docker-machine ip tools || {
   echo "Creating tools machine"
 
-  docker-machine create -d --virtualbox-disk-size $REGISTRY_DISK_SIZE virtualbox tools
+  docker-machine create -d virtualbox --virtualbox-disk-size $REGISTRY_DISK_SIZE tools
   eval $(docker-machine env tools)
 
   echo "Creating shared volume"
