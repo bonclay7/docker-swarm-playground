@@ -4,7 +4,7 @@ if [[ -z "$KAFKA_PORT" ]]; then
     export KAFKA_PORT=9092
 fi
 if [[ -z "$KAFKA_ADVERTISED_PORT" ]]; then
-    export KAFKA_ADVERTISED_PORT=$(docker port `hostname` $KAFKA_PORT | sed -r "s/.*:(.*)/\1/g")
+    export KAFKA_ADVERTISED_PORT=$KAFKA_PORT
 fi
 if [[ -z "$KAFKA_BROKER_ID" ]]; then
     # By default auto allocate broker ID
