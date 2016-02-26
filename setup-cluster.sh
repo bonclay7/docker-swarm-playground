@@ -36,12 +36,13 @@ docker-machine ip tools || {
     -v $(pwd)/proxy/squid.conf:/etc/squid3/squid.conf \
     sameersbn/squid:3.3.8-7
 
-  echo "Launching consul on tools machine"
-  docker run -d --restart=always\
+  docker run -d --restart=always \
       --name consul \
-      -p 8500:8500 \
-      -h "consul" \
-      progrium/consul -server -bootstrap
+      -p 8400:8400
+      -p 8500:8500
+      -p 8600:53/udp
+      -h consul
+      gliderlabs/consul-server -server -bootstrap
 
   echo "Launching zookeeper on tools machine"
   docker run -d --restart=always\
@@ -69,6 +70,7 @@ docker-machine create \
 
 eval $(docker-machine env swarm-master)
 docker run -d \
+    --restart=always \
     --name=registrator \
     --net=host \
     --volume=/var/run/docker.sock:/tmp/docker.sock \
