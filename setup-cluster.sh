@@ -58,6 +58,7 @@ export REGISTRY=http://${TOOLS_IP}:5000
 export HTTP_PROXY=http://${TOOLS_IP}:3128
 export HTTPS_PROXY=http://${TOOLS_IP}:3128
 export FTP_PROXY=http://${TOOLS_IP}:3128
+export NO_PROXY=${TOOLS_IP},localhost,127.0.0.1
 
 echo "Creating swarm-master"
 docker-machine create \
@@ -74,6 +75,7 @@ docker-machine create \
     --engine-env HTTP_PROXY=${HTTP_PROXY} \
     --engine-env HTTPS_PROXY=${HTTPS_PROXY} \
     --engine-env FTP_PROXY=${FTP_PROXY} \
+    --engine-env NO_PROXY=${NO_PROXY} \
     swarm-master
 
 eval $(docker-machine env swarm-master)
@@ -97,6 +99,7 @@ for i in $( seq 1 $SWARM_NODES ); do
       --engine-env HTTP_PROXY=${HTTP_PROXY} \
       --engine-env HTTPS_PROXY=${HTTPS_PROXY} \
       --engine-env FTP_PROXY=${FTP_PROXY} \
+      --engine-env NO_PROXY=${NO_PROXY} \
       --swarm \
       --swarm-discovery="$CONSUL" \
       --engine-opt="cluster-store=$CONSUL" \
