@@ -227,9 +227,9 @@ hostname = "localhost"
 ###
 
 [[graphite]]
-  enabled = false
-  # database = "graphite"
-  # bind-address = ":2003"
+  enabled = true
+  database = "graphite"
+  bind-address = ":2003"
   # protocol = "tcp"
   # consistency-level = "one"
 
@@ -266,14 +266,14 @@ hostname = "localhost"
 ###
 
 [collectd]
-  enabled = false
-  # database = "collectd"
+  enabled = true
+  database = "collectd"
   # bind-address = ":25826"
   # typesdb = ""
 
   # These next lines control how batching works. You should have this enabled
   # otherwise you could get dropped metrics or poor performance. Batching
-  # will buffer points in memory if you have many coming in.
+  # will buffer points in memory if you have many coming in.*",
 
   # batch-size = 1000 # will flush if this many points get buffered
   # batch-pending = 5 # number of batches that may be pending in memory
@@ -287,9 +287,9 @@ hostname = "localhost"
 ###
 
 [opentsdb]
-  enabled = false
-  # bind-address = ":4242"
-  # database = "opentsdb"
+  enabled = true
+  bind-address = ":4242"
+  database = "opentsdb"
   # retention-policy = ""
   # consistency-level = "one"
   # tls-enabled = false
