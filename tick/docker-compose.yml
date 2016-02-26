@@ -15,7 +15,7 @@ services:
       - "4242:4242"
       - "25826:25826/udp"
     environment:
-      - PRE_CREATE_DB=chronograf;collectd;opentsdb;graphite
+      - PRE_CREATE_DB=telegraf;collectd;opentsdb;graphite
     networks:
       - swarm-net
 
