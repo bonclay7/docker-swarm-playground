@@ -51,21 +51,29 @@ docker-machine ip tools || {
       jplock/zookeeper
 }
 
+export TOOLS_IP=$(docker-machine inspect --format '{{ .Driver.IPAddress }}' tools)
+
+export CONSUL=consul://${TOOLS_IP}:8500
+export REGISTRY=http://${TOOLS_IP}:5000
+export HTTP_PROXY=http://${TOOLS_IP}:3128
+export HTTPS_PROXY=http://${TOOLS_IP}:3128
+export FTP_PROXY=http://${TOOLS_IP}:3128
+
 echo "Creating swarm-master"
 docker-machine create \
     -d virtualbox \
     --virtualbox-memory $SWARM_MEMORY \
     --virtualbox-cpu-count $SWARM_CPU \
-    --engine-registry-mirror http://$(docker-machine ip tools):5000 \
+    --engine-registry-mirror $REGISTRY \
     --engine-insecure-registry registry-1.docker.io \
     --swarm \
     --swarm-master \
-    --swarm-discovery="consul://$(docker-machine ip tools):8500" \
-    --engine-opt="cluster-store=consul://$(docker-machine ip tools):8500" \
+    --swarm-discovery="$CONSUL" \
+    --engine-opt="cluster-store=$CONSUL" \
     --engine-opt="cluster-advertise=eth1:0" \
-    --engine-env HTTP_PROXY=http://$(docker-machine ip tools):3128/ \
-    --engine-env HTTPS_PROXY=http://$(docker-machine ip tools):3128/ \
-    --engine-env FTP_PROXY=http://$(docker-machine ip tools):3128/ \
+    --engine-env HTTP_PROXY=${HTTP_PROXY} \
+    --engine-env HTTPS_PROXY=${HTTPS_PROXY} \
+    --engine-env FTP_PROXY=${FTP_PROXY} \
     swarm-master
 
 eval $(docker-machine env swarm-master)
@@ -75,7 +83,7 @@ docker run -d \
     --net=host \
     --volume=/var/run/docker.sock:/tmp/docker.sock \
     gliderlabs/registrator:latest \
-    consul://$(docker-machine ip tools):8500
+    $CONSUL
 
 echo "Creating swarm nodes"
 for i in $( seq 1 $SWARM_NODES ); do
@@ -84,14 +92,14 @@ for i in $( seq 1 $SWARM_NODES ); do
       -d virtualbox \
       --virtualbox-memory $SWARM_MEMORY \
       --virtualbox-cpu-count $SWARM_CPU \
-      --engine-registry-mirror http://$(docker-machine ip tools):5000 \
+      --engine-registry-mirror $REGISTRY \
       --engine-insecure-registry registry-1.docker.io \
-      --engine-env HTTP_PROXY=http://$(docker-machine ip tools):3128/ \
-      --engine-env HTTPS_PROXY=http://$(docker-machine ip tools):3128/ \
-      --engine-env FTP_PROXY=http://$(docker-machine ip tools):3128/ \
+      --engine-env HTTP_PROXY=${HTTP_PROXY} \
+      --engine-env HTTPS_PROXY=${HTTPS_PROXY} \
+      --engine-env FTP_PROXY=${FTP_PROXY} \
       --swarm \
-      --swarm-discovery="consul://$(docker-machine ip tools):8500" \
-      --engine-opt="cluster-store=consul://$(docker-machine ip tools):8500" \
+      --swarm-discovery="$CONSUL" \
+      --engine-opt="cluster-store=$CONSUL" \
       --engine-opt="cluster-advertise=eth1:0" \
       $SWARM_NODE
 
@@ -103,11 +111,11 @@ for i in $( seq 1 $SWARM_NODES ); do
       --net=host \
       --volume=/var/run/docker.sock:/tmp/docker.sock \
       gliderlabs/registrator:latest \
-      consul://$(docker-machine ip tools):8500
+      $CONSUL
 done
 
 eval $(docker-machine env --swarm swarm-master)
 docker network inspect swarm-net && docker network rm swarm-net
 docker network create --driver overlay swarm-net
 
-curl $(docker-machine ip tools):8500/v1/catalog/services | jq
+curl -s $TOOLS_IP/v1/catalog/services | jq
