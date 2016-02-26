@@ -12,11 +12,10 @@ services:
     ports:
       - "8083:8083"
       - "8086:8086"
+      - "4242:4242"
       - "25826:25826/udp"
     environment:
-      - PRE_CREATE_DB=telemetry
-      - COLLECTD_DB=telemetry
-      - COLLECTD_BINDING=:25826
+      - PRE_CREATE_DB=chronograf;collectd;opentsdb;graphite
     networks:
       - swarm-net
 
