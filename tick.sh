@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 echo "Using swarm cluster environment"
 eval $(docker-machine env --swarm swarm-master)
 export PROXY_IP=$(docker-machine ip tools)
