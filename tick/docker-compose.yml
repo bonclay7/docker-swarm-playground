@@ -107,6 +107,7 @@ services:
     environment:
       - KAFKA_ADVERTISED_PORT=9092
       - KAFKA_ZOOKEEPER_CONNECT=${ZOOKEEPER_IP}
+      - KAFKA_CREATE_TOPICS=my-topic:1:1
     networks:
       - swarm-net
 
