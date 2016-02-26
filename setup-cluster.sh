@@ -38,10 +38,10 @@ docker-machine ip tools || {
 
   docker run -d --restart=always \
       --name consul \
-      -p 8400:8400
-      -p 8500:8500
-      -p 8600:53/udp
-      -h consul
+      -p 8400:8400 \
+      -p 8500:8500 \
+      -p 8600:53/udp \
+      -h consul \
       gliderlabs/consul-server -server -bootstrap
 
   echo "Launching zookeeper on tools machine"
