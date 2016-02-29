@@ -2,7 +2,6 @@
 
 set -x
 
-REGISTRY_DISK_SIZE=30000
 SWARM_NODES=2
 SWARM_CPU=4
 SWARM_MEMORY=4096
@@ -10,7 +9,7 @@ SWARM_MEMORY=4096
 docker-machine ip tools || {
   echo "Creating tools machine"
 
-  docker-machine create -d virtualbox --virtualbox-disk-size $REGISTRY_DISK_SIZE tools
+  docker-machine create -d virtualbox tools
   eval $(docker-machine env tools)
 
   echo "Creating shared volume"
@@ -21,18 +20,23 @@ docker-machine ip tools || {
 
   echo "Launching docker registry service on tools machine"
   docker run -d -p 5000:5000 \
-     --name registry \
+     --name registry-cache \
      --restart=always \
-     --volumes-from cache \
+     --privileged=true \
+     -v $(pwd)/.cache:/cache \
      -v $(pwd)/registry/config.yml:/etc/registry/config.yml \
      registry:2.3.0 /etc/registry/config.yml
+
+   echo "Launching local docker registry service on tools machine"
+      --name registry \
+      --restart=always \
+      registry:2.3.0
 
   echo "Launching squid proxy on tools machine"
   docker run -d \
     --name squid \
     --restart=always \
     -p 3128:3128 \
-    --volumes-from cache \
     -v $(pwd)/proxy/squid.conf:/etc/squid3/squid.conf \
     sameersbn/squid:3.3.8-7
 
@@ -43,18 +47,11 @@ docker-machine ip tools || {
       -p 8600:53/udp \
       -h consul \
       gliderlabs/consul-server -server -bootstrap
-
-  echo "Launching zookeeper on tools machine"
-  docker run -d --restart=always\
-      --name zookeeper \
-      -p 2181:2181 \
-      jplock/zookeeper
 }
 
 export TOOLS_IP=$(docker-machine inspect --format '{{ .Driver.IPAddress }}' tools)
 
 export CONSUL=consul://${TOOLS_IP}:8500
-export REGISTRY=http://${TOOLS_IP}:5000
 export HTTP_PROXY=http://${TOOLS_IP}:3128
 export HTTPS_PROXY=http://${TOOLS_IP}:3128
 export FTP_PROXY=http://${TOOLS_IP}:3128

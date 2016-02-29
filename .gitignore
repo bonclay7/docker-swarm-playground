@@ -1,2 +1,3 @@
 registry/cache/
 registry/proxy_cache
+.cache/

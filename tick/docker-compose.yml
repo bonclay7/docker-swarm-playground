@@ -1,6 +1,15 @@
 version: '2'
 
 services:
+
+  zookeeper:
+    image: jplock/zookeeper
+    hostname: zookeeper
+    ports: 
+      - "2181:2181"
+    networks:
+      - swarm-net
+
   influxdb:
     build:
       context: ./influxdb/
@@ -19,9 +28,9 @@ services:
     networks:
       - swarm-net
 
-  telegraf:
+  telegraf_influxdb:
     build:
-      context: ./telegraf/
+      context: ./telegraf_influxdb/
       args:
         - http_proxy=http://${PROXY_IP}:3128
         - https_proxy=http://${PROXY_IP}:3128
@@ -33,19 +42,42 @@ services:
     networks:
       - swarm-net
 
-  collectd:
+  telegraf_kafka:
     build:
-      context: ./collectd/
+      context: ./telegraf_kafka/
       args:
         - http_proxy=http://${PROXY_IP}:3128
         - https_proxy=http://${PROXY_IP}:3128
         - ftp_proxy=http://${PROXY_IP}:3128
         - no_proxy=localhost,127.0.0.1
-    hostname: collectd
+    hostname: telegraf
+    depends_on:
+      - zookeeper
+      - kafka
+    networks:
+      - swarm-net
+
+  collectd_influxdb:
+    build:
+      context: ./collectd_influxdb/
+      args:
+        - http_proxy=http://${PROXY_IP}:3128
+        - https_proxy=http://${PROXY_IP}:3128
+        - ftp_proxy=http://${PROXY_IP}:3128
+        - no_proxy=localhost,127.0.0.1
     ports:
       - "80:80"
     depends_on:
       - influxdb
+    networks:
+      - swarm-net
+
+  collectd_kafka:
+    image: mre0/collectd
+    volumes:
+     - ./collectd_kafka/collectd.conf:/etc/collectd.conf
+    depends_on:
+      - kafka
     networks:
       - swarm-net
 
@@ -103,13 +135,15 @@ services:
         - ftp_proxy=http://${PROXY_IP}:3128
         - no_proxy=localhost,127.0.0.1
     hostname: kafka
+    depends_on:
+      - zookeeper
     ports:
       - "9092:9092"
     environment:
       - KAFKA_ADVERTISED_PORT=9092
-      - KAFKA_ZOOKEEPER_CONNECT=${ZOOKEEPER_IP}
+      - KAFKA_ZOOKEEPER_CONNECT=zookeeper
       - KAFKA_ADVERTISED_HOST_NAME=kafka
-      - KAFKA_CREATE_TOPICS=my-topic:1:1
+      - KAFKA_CREATE_TOPICS=my-topic:1:10,telegraph:1:10,metrics:1:10
     networks:
       - swarm-net
 
