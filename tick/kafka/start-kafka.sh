@@ -23,7 +23,7 @@ if [[ -n "$KAFKA_HEAP_OPTS" ]]; then
 fi
 
 if [[ -z "$KAFKA_ADVERTISED_HOST_NAME" && -n "$HOSTNAME_COMMAND" ]]; then
-    export KAFKA_ADVERTISED_HOST_NAME=$(eval $HOSTNAME_COMMAND)
+    export KAFKA_ADVERTISED_HOST_NAME=$(/sbin/ifconfig eth0 | grep 'inet addr:' | cut -d: -f2 | awk '{ print $1}')
 fi
 
 for VAR in `env`
