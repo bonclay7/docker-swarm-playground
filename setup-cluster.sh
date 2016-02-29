@@ -12,13 +12,7 @@ docker-machine ip tools || {
   docker-machine create -d virtualbox tools
   eval $(docker-machine env tools)
 
-  echo "Creating shared volume"
-  docker create -v /cache --name cache ubuntu
-  echo "configuring shared volume"
-  docker run --rm -it --volumes-from cache ubuntu mkdir -p /cache/registry
-  docker run --rm -it --volumes-from cache ubuntu chmod -R 777 /cache
-
-  echo "Launching docker registry service on tools machine"
+  echo "Launching docker registry cache service on tools machine"
   docker run -d -p 5000:5000 \
      --name registry-cache \
      --restart=always \
@@ -28,18 +22,26 @@ docker-machine ip tools || {
      registry:2.3.0 /etc/registry/config.yml
 
    echo "Launching local docker registry service on tools machine"
+   docker run -d -p 5001:5000 \
       --name registry \
       --restart=always \
       registry:2.3.0
+
+   echo "Creating squid cache volume on tools machine"
+   docker create -v /cache --name squid-cache ubuntu
+   docker run --rm -it --volumes-from squid-cache ubuntu chmod -R 777 /cache/
 
   echo "Launching squid proxy on tools machine"
   docker run -d \
     --name squid \
     --restart=always \
+    --privileged=true \
+    --volumes-from squid-cache \
     -p 3128:3128 \
     -v $(pwd)/proxy/squid.conf:/etc/squid3/squid.conf \
     sameersbn/squid:3.3.8-7
 
+	echo "Launching consul server on tools machine"
   docker run -d --restart=always \
       --name consul \
       -p 8400:8400 \
@@ -52,6 +54,7 @@ docker-machine ip tools || {
 export TOOLS_IP=$(docker-machine inspect --format '{{ .Driver.IPAddress }}' tools)
 
 export CONSUL=consul://${TOOLS_IP}:8500
+export REGISTRY=http://${TOOLS_IP}:5001
 export HTTP_PROXY=http://${TOOLS_IP}:3128
 export HTTPS_PROXY=http://${TOOLS_IP}:3128
 export FTP_PROXY=http://${TOOLS_IP}:3128
@@ -64,6 +67,8 @@ docker-machine create \
     --virtualbox-cpu-count $SWARM_CPU \
     --engine-registry-mirror $REGISTRY \
     --engine-insecure-registry registry-1.docker.io \
+    --engine-insecure-registry ${TOOLS_IP}:5000 \
+    --engine-insecure-registry ${TOOLS_IP}:5001 \
     --swarm \
     --swarm-master \
     --swarm-discovery="$CONSUL" \
@@ -93,6 +98,8 @@ for i in $( seq 1 $SWARM_NODES ); do
       --virtualbox-cpu-count $SWARM_CPU \
       --engine-registry-mirror $REGISTRY \
       --engine-insecure-registry registry-1.docker.io \
+      --engine-insecure-registry ${TOOLS_IP}:5000 \
+      --engine-insecure-registry ${TOOLS_IP}:5001 \
       --engine-env HTTP_PROXY=${HTTP_PROXY} \
       --engine-env HTTPS_PROXY=${HTTPS_PROXY} \
       --engine-env FTP_PROXY=${FTP_PROXY} \
