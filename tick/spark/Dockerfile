@@ -3,6 +3,7 @@ FROM java:7
 RUN apt-get update && apt-get install -y curl python python-pip tar
 
 ARG SPARK_VERSION=1.6.0
+ENV SPARK_VERSION ${SPARK_VERSION}
 
 WORKDIR /opt
 
