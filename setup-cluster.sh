@@ -80,6 +80,7 @@ docker-machine create \
     --engine-env NO_PROXY=${NO_PROXY} \
     swarm-master
 
+export NO_PROXY=$(docker-machine ip swarm-master),$NO_PROXY
 eval $(docker-machine env swarm-master)
 docker run -d \
     --restart=always \
@@ -109,6 +110,8 @@ for i in $( seq 1 $SWARM_NODES ); do
       --engine-opt="cluster-store=$CONSUL" \
       --engine-opt="cluster-advertise=eth1:0" \
       $SWARM_NODE
+
+	export NO_PROXY=$(docker-machine ip $SWARM_NODE),$NO_PROXY
 
   eval $(docker-machine env $SWARM_NODE)
 
