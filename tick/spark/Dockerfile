@@ -11,7 +11,7 @@ RUN curl http://apache.mirrors.ovh.net/ftp.apache.org/dist/spark/spark-${SPARK_V
 
 WORKDIR /opt/spark-${SPARK_VERSION}-bin-hadoop2.6
 
-ADD basic_kafka_streaming.py .
+ADD kafka_spark_streaming_to_influxdb.py .
 
 CMD bin/spark-submit --packages org.apache.spark:spark-streaming-kafka_2.10:${SPARK_VERSION} \
-    basic_kafka_streaming.py zookeeper:2181 metrics
+    kafka_spark_streaming_to_influxdb.py zookeeper:2181 telegraf

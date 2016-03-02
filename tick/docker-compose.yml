@@ -24,7 +24,7 @@ services:
       - "4242:4242"
       - "25826:25826/udp"
     environment:
-      - PRE_CREATE_DB=telegraf;collectd;opentsdb;graphite
+      - PRE_CREATE_DB=kafka_to_influxdb_via_spark;telegraf;collectd;opentsdb;graphite
     networks:
       - swarm-net
 
@@ -143,7 +143,7 @@ services:
       - KAFKA_ADVERTISED_PORT=9092
       - KAFKA_ZOOKEEPER_CONNECT=zookeeper
       - KAFKA_ADVERTISED_HOST_NAME=kafka
-      - KAFKA_CREATE_TOPICS=my-topic:1:10,telegraph:1:10,metrics:1:10
+      - KAFKA_CREATE_TOPICS=my-topic:1:1,telegraf:1:1,collectd:1:1
     networks:
       - swarm-net
 
